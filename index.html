@@ -3,22 +3,23 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rec Studio - Browser screen studio</title>
+    <title>Rec Studio - Browser Screen Studio</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
+
   <body>
     <div class="studio-container">
       <!-- SIDEBAR CONTROLS -->
       <aside class="sidebar">
         <div class="brand">
           <span class="rec-dot"></span>
-          <h2>Rec Studio</h2>
+          <h2>Studio Rec</h2>
         </div>
 
         <div class="control-group">
           <h3>1. Sources</h3>
           <button id="btnScreen" class="btn secondary">🖥️ Share Screen</button>
-          <button id="btnWebcam" class="btn secondary">📷 Toggle Webcam</button>
+          <button id="btnWebcam" class="btn secondary">📷 Toggle WebCam</button>
         </div>
 
         <div class="control-group">
@@ -27,8 +28,8 @@
           <input
             type="text"
             id="watermarkInput"
-            placeholder="e.g Cofidential Draft"
-            value="RecStudio on Studious-garbanzo"
+            placeholder="e.g. Confidential Draft"
+            value="RecStudio on Studious Garbanzo"
           />
 
           <label for="pipPosition">Webcam Position</label>
@@ -42,7 +43,7 @@
 
         <div class="control-group">
           <h3>3. Recording</h3>
-          <button id="btnRecord" class="btn primary" disabled>
+          <button id="btRecord" class="btn primary" disabled>
             🔴 Start Recording
           </button>
           <button id="btnStop" class="btn danger" disabled>⏹️ Stop</button>
@@ -52,8 +53,8 @@
 
       <!-- MAIN WORKSPACE -->
       <main class="workspace">
-        <!-- LIVE STUDIO CANVAS REVIEW -->
         <div class="canvas-wrapper">
+          <!-- FIXED ID: studioCanvas -->
           <canvas id="studioCanvas" width="1920" height="1080"></canvas>
           <div class="status-badge" id="statusBadge">Ready</div>
         </div>
@@ -62,34 +63,33 @@
         <div id="outputSection" class="output-section hidden">
           <h3>Latest Recording</h3>
           <video controls id="previewPlayer"></video>
+          <!-- FIXED ID: downloadLink -->
           <a
-            href=""
+            href="#"
             id="downloadLink"
             class="btn success"
             download="studio-recording.webm"
-            >💾 Download Webm</a
           >
+            💾 Download Webm
+          </a>
         </div>
       </main>
     </div>
 
-    <!-- HIDDEN VIDEO ELEMENTS TO BUFFER RAW FEEDS -->
-
+    <!-- HIDDEN BUFFER VIDEOS -->
     <video
-      src=""
       id="rawScreenVideo"
       autoplay
       playsinline
       style="display: none"
     ></video>
     <video
-      src=""
-      id="rawWebcamVideo"
+      id="rewWebcamVideo"
       autoplay
       playsinline
       style="display: none"
     ></video>
-
-    <script src="script.js"></script>
   </body>
+
+  <script src="script.js"></script>
 </html>
