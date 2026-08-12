@@ -201,4 +201,87 @@ async function setupAudioMixer() {
 
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
   audioDestination = audioContext.createMediaStreamDestination();
+
+  if (screenStream && screenStream.getAudioTracks().length > 0) {
+    const screenSource = audioContext.createMediaStreamSource(screenStream);
+    screenSource.connect(audioDestination);
+  }
+
+  if (webcamStream && webcamStream.getAudioTracks().length > 0) {
+    const micSource = audioContext.createMediaStreamSource(webcamStream);
+    micSource.connect(audioDestination);
+  }
 }
+
+// 5. Start Recording
+btnRecord.addEventListener("click", async () => {
+  if (!screenStream && !webcamStream) return;
+
+  recordedChunks = [];
+  await setupAudioMixer();
+
+  const canvasStream = new canvas.captureStream(60);
+
+  const combinedTracks = [
+    ...canvasStream.getVideoTracks(),
+    ...audioDestination.stream.getAudioTracks(),
+  ];
+
+  const combinedStream = new MediaStream(combinedTracks);
+
+  const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
+    ? "video/webm;codecs=vp9,opus"
+    : "video/webm";
+
+  mediaRecorder = new MediaRecorder(combinedStream, { mimeType });
+
+  mediaRecorder.ondataavailable = (e) => {
+    if (e.data.size > 0) recordedChunks.push(e.data);
+  };
+
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(recordedChunks, { type: "video/webm" });
+
+    if (previewPlayer.src) {
+      URL.revokeObjectURL(previewPlayer.src);
+    }
+
+    const videoURL = URL.createObjectURL(blob);
+    previewPlayer.src = videoUrl;
+    downloadLink.src = videoUrl;
+    outputSection.classList.remove("hidden");
+  };
+
+  mediaRecorder.start(1000);
+  isRecording = true;
+  btnRecord.disabled = true;
+  btnStop.disabled = false;
+  statusBadge.textContent = "🔴 Recording ...";
+
+  secondsElapsed = 0;
+  timerInterval = setInterval(() => {
+    secondsElapsed++;
+    const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, "0");
+    const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(
+      2,
+      "0",
+    );
+    const secs = String(secondsElapsed % 60).padStart(2, "0");
+
+    timerDisplay.textContent = `${hrs}:${mins}:${secs}`;
+  }, 1000);
+});
+
+//6. Stop Recording
+btnStop.addEventListener("click", () => {
+  if (!mediaRecorder || !isRecording) return;
+
+  mediaRecorder.stop();
+  isRecording = false;
+  clearInterval(timerInterval);
+
+  btnStop.disabled = true;
+  updateRecordButtonState();
+
+  statusBadge.textContent = "Recording Saved";
+});
