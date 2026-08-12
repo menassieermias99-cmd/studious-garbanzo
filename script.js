@@ -79,7 +79,7 @@ btnScreen.addEventListener("click", async () => {
       updateRecordButtonState();
     };
   } catch (error) {
-    console.error("Error sharing screen: ", err);
+    console.error("Error sharing screen: ", error);
     statusBadge.textContent = "Screen Canceled";
   }
 });
@@ -155,7 +155,7 @@ function renderStudioCanvas() {
       ctx.strokeStyle = "#3b82f6";
       ctx.lineWidth = 4;
       ctx.beginPath();
-      ctx.roudnRect(x, y, pipWidth, pipHeight, 20);
+      ctx.roundRect(x, y, pipWidth, pipHeight, 20);
       ctx.stroke();
     }
   } else if (hasWebcam) {
@@ -220,7 +220,7 @@ btnRecord.addEventListener("click", async () => {
   recordedChunks = [];
   await setupAudioMixer();
 
-  const canvasStream = new canvas.captureStream(60);
+  const canvasStream = canvas.captureStream(60);
 
   const combinedTracks = [
     ...canvasStream.getVideoTracks(),
@@ -247,8 +247,8 @@ btnRecord.addEventListener("click", async () => {
     }
 
     const videoURL = URL.createObjectURL(blob);
-    previewPlayer.src = videoUrl;
-    downloadLink.src = videoUrl;
+    previewPlayer.src = videoURL;
+    downloadLink.href = videoURL;
     outputSection.classList.remove("hidden");
   };
 
