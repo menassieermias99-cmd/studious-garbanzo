@@ -10,11 +10,11 @@ const timerDisplay = document.getElementById("timer");
 const statusBadge = document.getElementById("statusBadge");
 
 const canvas = document.getElementById("studioCanvas");
-const ctx = canvas.getCotenxt("2d");
+const ctx = canvas.getContext("2d");
 const rawScreenVideo = document.getElementById("rawScreenVideo");
 const rawWebcamVideo = document.getElementById("rawWebcamVideo");
 
-const outputSection = document.getElementById("outputSelection");
+const outputSection = document.getElementById("outputSection");
 const previewPlayer = document.getElementById("previewPlayer");
 const downloadLink = document.getElementById("downloadLink");
 
@@ -59,7 +59,7 @@ btnScreen.addEventListener("click", async () => {
 // 2. toggle webcam stream
 btnWebcam.addEventListener("click", async () => {
   if (webcamStream) {
-    webcamStream.getTracks().foreach((t) => t.stop());
+    webcamStream.getTracks().forEach((t) => t.stop());
     webcamStream = null;
     rawWebcamVideo.srcObject = null;
     btnWebcam.textContent = "📷 Toggle Webcam";
@@ -114,8 +114,11 @@ function renderStudioCanvas() {
     } else if (pos === "top-right") {
       x = canvas.width - pipWidth - margin;
       y = margin;
-    } else if (pos === "bottom-right") {
+    } else if (pos === "bottom-left") {
       x = margin;
+      y = canvas.height - pipHeight - margin;
+    } else if (pos === "bottom-right") {
+      x = canvas.width - pipWidth - margin;
       y = canvas.height - pipHeight - margin;
     }
 
@@ -138,7 +141,7 @@ function renderStudioCanvas() {
   const text = watermarkInput.value.trim();
   if (text) {
     ctx.save();
-    ctx.font = "bold 32px san-serif";
+    ctx.font = "bold 32px sans-serif";
     ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
     ctx.shadowColor = "rgba(0,0,0,0.8)";
     ctx.shadowBlur = 6;
@@ -160,7 +163,7 @@ function setupAudioMixer() {
   // Add screen audio if present
   if (screenStream && screenStream.getAudioTracks().length > 0) {
     const screenSource = audioContext.createMediaStreamSource(screenStream);
-    screenSource.connect(audioContext);
+    screenSource.connect(audioDestination);
   }
 
   // Add Microphone Audio if present
@@ -185,7 +188,7 @@ btnRecord.addEventListener("click", () => {
     ...audioDestination.stream.getAudioTracks(),
   ];
 
-  const combinedStream = new MediaStream(combinedStream);
+  const combinedStream = new MediaStream(combinedTracks);
 
   mediaRecorder = new MediaRecorder(combinedStream, {
     mimeType: "video/webm;codecs=vp9,opus",
@@ -206,7 +209,7 @@ btnRecord.addEventListener("click", () => {
 
   mediaRecorder.start(1000); //Record in 1s chunks
   isRecording = true;
-  btnRecord.disabled = false;
+  btnRecord.disabled = true;
   statusBadge.textContent = "🔴 Recording ...";
 
   // start timer
@@ -214,7 +217,7 @@ btnRecord.addEventListener("click", () => {
   timerInterval = setInterval(() => {
     secondsElapsed++;
     const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, "0");
-    const mins = String(Math.floor(secondsElapsed / 3600)).padStart(2, "0");
+    const mins = String(Math.floor(secondsElapsed % 3600)).padStart(2, "0");
     const secs = String(secondsElapsed % 60).padStart(2, "0");
     timerDisplay.textContent = `${hrs}:${mins}:${secs}`;
   }, 1000);
