@@ -168,7 +168,11 @@ function renderStudioCanvas() {
 requestAnimationFrame(renderStudioCanvas);
 
 //4. Web Audio Mixer
-function setupAudioMixer() {
+async function setupAudioMixer() {
+  if (audioContext) {
+    await audioContext.close();
+  }
+
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
   audioDestination = audioContext.createMediaStreamDestination();
 
