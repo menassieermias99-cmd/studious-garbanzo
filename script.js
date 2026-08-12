@@ -35,24 +35,35 @@ let secondsElapsed = 0;
 
 btnScreen.addEventListener("click", async () => {
   try {
-    screenStream = await navigator.mediaDevices.getDisplayMedia({
-      video: { width: 1920, height: 1080, frameRate: 60 },
-      audio: true,
-    });
+    try {
+      screenStream = await navigator.mediaDevices.getDisplayMedia({
+        video: { width: 1920, height: 1080, frameRate: 60 },
+        audio: true,
+      });
+    } catch (audioErr) {
+      console.warn(
+        "Screen audio capture failed/unsupported, Falling back to video only.",
+        audioErr,
+      );
+      screenStream = await navigator.mediaDevices.getDisplayMedia({
+        video: { width: 1920, height: 1080, frameRate: 60 },
+      });
+    }
 
     rawScreenVideo.srcObject = screenStream;
     statusBadge.textContent = "Screen Active";
 
     btnRecord.disabled = false;
 
-    //auto stop if user stops sharing via browser ui
+    //Auto Stop if user stops sharing via browser UI
     screenStream.getVideoTracks()[0].onended = () => {
       screenStream = null;
       statusBadge.textContent = "Screen Ended";
       btnRecord.disabled = true;
     };
-  } catch (err) {
-    console.error("Error Sharing Screen: ", err);
+  } catch (error) {
+    console.error("Error sharing screen: ", error);
+    statusBadge.textContent = "Screen Cancelled";
   }
 });
 
@@ -89,6 +100,7 @@ function renderStudioCanvas() {
     ctx.drawImage(rawScreenVideo, 0, 0, canvas.width, canvas.height);
   } else {
     //Placeholder text if screen not ready
+    ctx.save();
     ctx.fillStyle = "#64748b";
     ctx.font = "bold 36px sans-serif";
     ctx.textAlign = "center";
@@ -210,6 +222,7 @@ btnRecord.addEventListener("click", () => {
   mediaRecorder.start(1000); //Record in 1s chunks
   isRecording = true;
   btnRecord.disabled = true;
+  btnStop.disabled = false;
   statusBadge.textContent = "🔴 Recording ...";
 
   // start timer
@@ -217,7 +230,10 @@ btnRecord.addEventListener("click", () => {
   timerInterval = setInterval(() => {
     secondsElapsed++;
     const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, "0");
-    const mins = String(Math.floor(secondsElapsed % 3600)).padStart(2, "0");
+    const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(
+      2,
+      "0",
+    );
     const secs = String(secondsElapsed % 60).padStart(2, "0");
     timerDisplay.textContent = `${hrs}:${mins}:${secs}`;
   }, 1000);
