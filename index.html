@@ -42,8 +42,10 @@
 
         <div class="control-group">
           <h3>3. Recording</h3>
-          <button id="btnRecord" class="btn primary">🔴 Start Recording</button>
-          <button id="btnStop" class="btn primary">⏹️ Stop</button>
+          <button id="btnRecord" class="btn primary" disabled>
+            🔴 Start Recording
+          </button>
+          <button id="btnStop" class="btn danger" disabled>⏹️ Stop</button>
           <div class="timer" id="timer">00:00:00</div>
         </div>
       </aside>
@@ -52,7 +54,7 @@
       <main class="workspace">
         <!-- LIVE STUDIO CANVAS REVIEW -->
         <div class="canvas-wrapper">
-          <canvas id="studio-canvas" width="1920" height="1080"></canvas>
+          <canvas id="studioCanvas" width="1920" height="1080"></canvas>
           <div class="status-badge" id="statusBadge">Ready</div>
         </div>
 
@@ -62,7 +64,7 @@
           <video controls id="previewPlayer"></video>
           <a
             href=""
-            id="download-link"
+            id="downloadLink"
             class="btn success"
             download="studio-recording.webm"
             >💾 Download Webm</a
